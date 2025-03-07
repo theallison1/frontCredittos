@@ -1,0 +1,100 @@
+/* Estilos generales */
+body {
+    background-color: #f8f9fa; /* Fondo gris claro */
+    font-family: 'Arial', sans-serif; /* Fuente moderna */
+}
+
+/* Estilos para el menú de navegación */
+.navbar {
+    background-color: #ffffff; /* Fondo blanco */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: #007bff !important; /* Color azul para el logo */
+}
+
+.nav-link {
+    color: #333333 !important; /* Color oscuro para los enlaces */
+}
+
+.nav-link:hover {
+    color: #007bff !important; /* Color azul al pasar el mouse */
+}
+
+/* Estilos para los botones */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+/* Estilos para las tarjetas */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.card-title {
+    color: #007bff; /* Color azul para los títulos */
+    font-weight: bold;
+}
+
+/* Estilos para los formularios */
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Resaltar al enfocar */
+}
+
+/* Estilos para la lista de deudores */
+.table {
+    background-color: #ffffff; /* Fondo blanco para la tabla */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.table th {
+    background-color: #007bff; /* Fondo azul para los encabezados */
+    color: #ffffff; /* Texto blanco */
+}
+
+.table td {
+    vertical-align: middle; /* Alinear contenido al centro */
+}
+
+/* Estilos para el login */
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.login-container h2 {
+    color: #007bff; /* Color azul para el título */
+    font-weight: bold;
+    text-align: center;
+}
