@@ -9,37 +9,54 @@ const CargaDeudores = () => {
     const [montoCuotaSemanal, setMontoCuotaSemanal] = useState(0);
     const [fechaInicio, setFechaInicio] = useState('');
     const [fechaUltimoPago, setFechaUltimoPago] = useState('');
-    const [fechaProximoPago, setFechaProximoPago] = useState(''); // Nuevo campo
+    const [fechaProximoPago, setFechaProximoPago] = useState('');
     const [montoPendiente, setMontoPendiente] = useState(0);
     const [cobrado, setCobrado] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(''); // Limpiar errores anteriores
+
         const deudor = {
             nombreDeudor,
             montoInicial,
             montoCuotaSemanal,
             fechaInicio,
             fechaUltimoPago,
-            fechaProximoPago, // Nuevo campo
+            fechaProximoPago,
             montoPendiente,
             cobrado,
         };
+
         try {
-            const response = await axios.post('http://localhost:8080/api/deudores', deudor, {
-                auth: {
-                    username: 'user',
-                    password: 'password',
+            // Obtener el token JWT del localStorage
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('No estás autenticado. Por favor, inicia sesión.');
+                return;
+            }
+
+            // Realizar la solicitud POST al endpoint de deudores
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/deudores`, deudor, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Enviar el token en el encabezado
                 },
             });
+
             if (response.status === 200) {
                 alert('Deudor guardado exitosamente');
-                navigate('/lista-deudores');
+                navigate('/lista-deudores'); // Redirigir a la lista de deudores
             }
         } catch (err) {
+            // Manejar errores
+            if (err.response) {
+                setError(err.response.data.message || 'Error al guardar el deudor');
+            } else {
+                setError('Error de conexión. Inténtalo de nuevo más tarde.');
+            }
             console.error("Error al guardar el deudor:", err);
-            alert('Error al guardar el deudor');
         }
     };
 
@@ -47,6 +64,7 @@ const CargaDeudores = () => {
         <div className="card">
             <div className="card-body">
                 <h2 className="card-title">Cargar datos del deudor</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label htmlFor="nombreDeudor" className="form-label">Nombre del deudor</label>
@@ -57,6 +75,7 @@ const CargaDeudores = () => {
                             placeholder="Nombre del deudor"
                             value={nombreDeudor}
                             onChange={(e) => setNombreDeudor(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="mb-3">
@@ -68,6 +87,7 @@ const CargaDeudores = () => {
                             placeholder="Monto inicial"
                             value={montoInicial}
                             onChange={(e) => setMontoInicial(parseFloat(e.target.value))}
+                            required
                         />
                     </div>
                     <div className="mb-3">
@@ -79,6 +99,7 @@ const CargaDeudores = () => {
                             placeholder="Monto de la cuota semanal"
                             value={montoCuotaSemanal}
                             onChange={(e) => setMontoCuotaSemanal(parseFloat(e.target.value))}
+                            required
                         />
                     </div>
                     <div className="mb-3">
@@ -90,6 +111,7 @@ const CargaDeudores = () => {
                             placeholder="Fecha de inicio"
                             value={fechaInicio}
                             onChange={(e) => setFechaInicio(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="mb-3">
@@ -101,6 +123,7 @@ const CargaDeudores = () => {
                             placeholder="Fecha del último pago"
                             value={fechaUltimoPago}
                             onChange={(e) => setFechaUltimoPago(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="mb-3">
@@ -112,6 +135,7 @@ const CargaDeudores = () => {
                             placeholder="Fecha próximo pago"
                             value={fechaProximoPago}
                             onChange={(e) => setFechaProximoPago(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="mb-3">
@@ -123,6 +147,7 @@ const CargaDeudores = () => {
                             placeholder="Monto pendiente"
                             value={montoPendiente}
                             onChange={(e) => setMontoPendiente(parseFloat(e.target.value))}
+                            required
                         />
                     </div>
                     <div className="mb-3 form-check">

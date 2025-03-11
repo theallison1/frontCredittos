@@ -4,18 +4,34 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ListaDeudores = () => {
     const [deudores, setDeudores] = useState([]);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchDeudores = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/deudores', {
-                    auth: {
-                        username: 'user',
-                        password: 'password',
+                // Obtener el token JWT del localStorage
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    setError('No estás autenticado. Por favor, inicia sesión.');
+                    return;
+                }
+
+                // Realizar la solicitud GET al endpoint de deudores
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/deudores`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Enviar el token en el encabezado
                     },
                 });
+
+                // Actualizar el estado con los datos de los deudores
                 setDeudores(response.data);
             } catch (err) {
+                // Manejar errores
+                if (err.response) {
+                    setError(err.response.data.message || 'Error al obtener los deudores');
+                } else {
+                    setError('Error de conexión. Inténtalo de nuevo más tarde.');
+                }
                 console.error("Error al obtener los deudores:", err);
             }
         };
@@ -27,6 +43,7 @@ const ListaDeudores = () => {
         <div className="card">
             <div className="card-body">
                 <h2 className="card-title">Lista de deudores</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="table-responsive">
                     <table className="table">
                         <thead>

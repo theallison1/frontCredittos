@@ -11,19 +11,33 @@ const Login = ({ onLogin }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(''); // Limpiar errores anteriores
+
         try {
-            const response = await axios.get('http://localhost:8080/api/test', {
-                auth: {
+            // Realizar la solicitud POST al endpoint de login
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/auth/login`, // Usar la URL del backend desde .env
+                {
                     username: username,
                     password: password,
-                },
-            });
-            if (response.status === 200) {
-                onLogin(true);
-                navigate('/home');
-            }
+                }
+            );
+
+            // Si el login es exitoso, obtener el token JWT
+            const token = response.data; // El backend devuelve el token directamente
+            localStorage.setItem('token', token); // Guardar el token en localStorage
+
+            onLogin(true); // Notificar que el usuario ha iniciado sesión
+            navigate('/home'); // Redirigir al usuario a la página de inicio
         } catch (err) {
-            setError('Credenciales incorrectas');
+            // Manejar errores
+            if (err.response) {
+                // Error de respuesta del servidor
+                setError(err.response.data.message || 'Credenciales incorrectas');
+            } else {
+                // Error de red o otro tipo de error
+                setError('Error de conexión. Inténtalo de nuevo más tarde.');
+            }
         }
     };
 
@@ -40,6 +54,7 @@ const Login = ({ onLogin }) => {
                         placeholder="Usuario"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        required
                     />
                 </div>
                 <div className="mb-3">
@@ -51,6 +66,7 @@ const Login = ({ onLogin }) => {
                         placeholder="Contraseña"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
                     />
                 </div>
                 {error && <div className="alert alert-danger">{error}</div>}

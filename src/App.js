@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, Link, useNavigate, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Home from './components/Home';
@@ -13,7 +13,18 @@ const App = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Verificar si el usuario está autenticado al cargar la aplicación
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, []);
+
     const handleLogout = () => {
+        localStorage.removeItem('token'); // Eliminar el token al cerrar sesión
         setIsLoggedIn(false);
         navigate('/');
     };
