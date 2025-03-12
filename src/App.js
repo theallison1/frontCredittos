@@ -9,6 +9,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css'; // Importar estilos personalizados
 import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
 import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
+import { isTokenExpired, logout } from './auth'; // Importar funciones de autenticación
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,10 +41,11 @@ const App = () => {
     // Verificar si el usuario está autenticado al cargar la aplicación
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token) {
+        if (token && !isTokenExpired(token)) {
             setIsLoggedIn(true);
         } else {
             setIsLoggedIn(false);
+            localStorage.removeItem('token'); // Eliminar el token si ha caducado
         }
         setIsLoading(false); // Finaliza la carga inicial
 
@@ -69,6 +71,8 @@ const App = () => {
         localStorage.removeItem('token'); // Eliminar el token al cerrar sesión
         setIsLoggedIn(false);
         setShowInactivityModal(false); // Ocultar el modal
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        if (inactivityConfirmationTimer) clearTimeout(inactivityConfirmationTimer);
         navigate('/');
     };
 
@@ -79,9 +83,15 @@ const App = () => {
 
     const showMenu = location.pathname !== '/';
 
-    // Si está cargando, muestra un mensaje de carga (o un spinner)
+    // Si está cargando, muestra un spinner
     if (isLoading) {
-        return <div>Cargando...</div>;
+        return (
+            <div className="d-flex justify-content-center align-items-center vh-100">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        );
     }
 
     return (

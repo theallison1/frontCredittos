@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { isTokenExpired, logout } from './auth'; // Importar funciones de autenticación
+import { isTokenExpired, logout } from '../auth'; // Importar funciones de autenticación
 import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
 import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
 
