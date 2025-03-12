@@ -6,6 +6,7 @@ const ListaDeudores = () => {
     const [deudores, setDeudores] = useState([]);
     const [error, setError] = useState('');
 
+    // Obtener la lista de deudores al cargar el componente
     useEffect(() => {
         const fetchDeudores = async () => {
             try {
@@ -35,6 +36,7 @@ const ListaDeudores = () => {
         fetchDeudores();
     }, []);
 
+    // Manejar el pago de una cuota
     const handlePagarCuota = async (id) => {
         try {
             const token = localStorage.getItem('token');
@@ -43,7 +45,6 @@ const ListaDeudores = () => {
                 return;
             }
 
-            // Realizar la solicitud PUT para actualizar el pago de la cuota
             const response = await axios.put(
                 `${process.env.REACT_APP_API_URL}/api/deudores/${id}/pagar-cuota`,
                 {},
@@ -60,6 +61,9 @@ const ListaDeudores = () => {
                     deudor.id === id ? response.data : deudor
                 );
                 setDeudores(updatedDeudores);
+
+                // Mostrar un mensaje de éxito
+                alert('Cuota pagada exitosamente');
             }
         } catch (err) {
             if (err.response) {
@@ -103,12 +107,17 @@ const ListaDeudores = () => {
                                     <td>${deudor.montoPendiente.toFixed(2)}</td>
                                     <td>{deudor.cobrado ? "Sí" : "No"}</td>
                                     <td>
-                                        <button
-                                            className="btn btn-success btn-sm"
-                                            onClick={() => handlePagarCuota(deudor.id)}
-                                        >
-                                            Pagar Cuota
-                                        </button>
+                                        {deudor.cobrado || deudor.montoPendiente <= 0 ? (
+                                            <span className="text-success">Cobrado</span>
+                                        ) : (
+                                            <button
+                                                className="btn btn-success btn-sm"
+                                                onClick={() => handlePagarCuota(deudor.id)}
+                                                disabled={deudor.montoPendiente <= 0 || deudor.cobrado}
+                                            >
+                                                Pagar Cuota
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
