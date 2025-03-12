@@ -7,12 +7,35 @@ import ListaDeudores from './components/ListaDeudores';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css'; // Importar estilos personalizados
+import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
+import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
+    const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Temporizador para detectar inactividad
+    let inactivityTimer;
+    let inactivityConfirmationTimer;
+
+    // Función para reiniciar el temporizador de inactividad
+    const resetInactivityTimer = () => {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        if (inactivityConfirmationTimer) clearTimeout(inactivityConfirmationTimer);
+
+        // Configurar el temporizador de inactividad (5 minutos)
+        inactivityTimer = setTimeout(() => {
+            setShowInactivityModal(true); // Mostrar el modal de confirmación
+
+            // Configurar el temporizador de cierre automático (3 segundos)
+            inactivityConfirmationTimer = setTimeout(() => {
+                handleLogout(); // Cerrar sesión automáticamente
+            }, 3000); // 3 segundos
+        }, 5 * 60 * 1000); // 5 minutos
+    };
 
     // Verificar si el usuario está autenticado al cargar la aplicación
     useEffect(() => {
@@ -23,12 +46,35 @@ const App = () => {
             setIsLoggedIn(false);
         }
         setIsLoading(false); // Finaliza la carga inicial
+
+        // Reiniciar el temporizador al cargar la aplicación
+        resetInactivityTimer();
+
+        // Agregar event listeners para detectar interacción del usuario
+        window.addEventListener('mousemove', resetInactivityTimer);
+        window.addEventListener('keydown', resetInactivityTimer);
+        window.addEventListener('click', resetInactivityTimer);
+
+        // Limpiar event listeners al desmontar el componente
+        return () => {
+            window.removeEventListener('mousemove', resetInactivityTimer);
+            window.removeEventListener('keydown', resetInactivityTimer);
+            window.removeEventListener('click', resetInactivityTimer);
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            if (inactivityConfirmationTimer) clearTimeout(inactivityConfirmationTimer);
+        };
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // Eliminar el token al cerrar sesión
         setIsLoggedIn(false);
+        setShowInactivityModal(false); // Ocultar el modal
         navigate('/');
+    };
+
+    const handleContinueSession = () => {
+        setShowInactivityModal(false); // Ocultar el modal
+        resetInactivityTimer(); // Reiniciar el temporizador
     };
 
     const showMenu = location.pathname !== '/';
@@ -117,6 +163,24 @@ const App = () => {
                     />
                 </Routes>
             </div>
+
+            {/* Modal de confirmación de inactividad */}
+            <Modal show={showInactivityModal} onHide={handleContinueSession}>
+                <Modal.Header closeButton>
+                    <Modal.Title>¿Sigues ahí?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Tu sesión está a punto de cerrarse debido a inactividad. ¿Deseas continuar navegando?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleLogout}>
+                        Cerrar sesión
+                    </Button>
+                    <Button variant="primary" onClick={handleContinueSession}>
+                        Continuar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };

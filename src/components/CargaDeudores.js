@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { isTokenExpired, logout } from './auth'; // Importar funciones de autenticación
+import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
+import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
 
 const CargaDeudores = () => {
     const [nombreDeudor, setNombreDeudor] = useState('');
@@ -13,11 +16,70 @@ const CargaDeudores = () => {
     const [montoPendiente, setMontoPendiente] = useState(0);
     const [cobrado, setCobrado] = useState(false);
     const [error, setError] = useState('');
+    const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
     const navigate = useNavigate();
+
+    // Temporizador para detectar inactividad
+    let inactivityTimer;
+    let inactivityConfirmationTimer;
+
+    // Función para reiniciar el temporizador de inactividad
+    const resetInactivityTimer = () => {
+        if (inactivityTimer) clearTimeout(inactivityTimer);
+        if (inactivityConfirmationTimer) clearTimeout(inactivityConfirmationTimer);
+
+        // Configurar el temporizador de inactividad (5 minutos)
+        inactivityTimer = setTimeout(() => {
+            setShowInactivityModal(true); // Mostrar el modal de confirmación
+
+            // Configurar el temporizador de cierre automático (3 segundos)
+            inactivityConfirmationTimer = setTimeout(() => {
+                handleLogout(); // Cerrar sesión automáticamente
+            }, 3000); // 3 segundos
+        }, 5 * 60 * 1000); // 5 minutos
+    };
+
+    // Verificar la inactividad al cargar el componente y con la interacción del usuario
+    useEffect(() => {
+        resetInactivityTimer(); // Iniciar el temporizador al cargar el componente
+
+        // Agregar event listeners para detectar interacción del usuario
+        window.addEventListener('mousemove', resetInactivityTimer);
+        window.addEventListener('keydown', resetInactivityTimer);
+        window.addEventListener('click', resetInactivityTimer);
+
+        // Limpiar event listeners al desmontar el componente
+        return () => {
+            window.removeEventListener('mousemove', resetInactivityTimer);
+            window.removeEventListener('keydown', resetInactivityTimer);
+            window.removeEventListener('click', resetInactivityTimer);
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            if (inactivityConfirmationTimer) clearTimeout(inactivityConfirmationTimer);
+        };
+    }, []);
+
+    const handleLogout = () => {
+        logout(); // Cerrar sesión
+        setShowInactivityModal(false); // Ocultar el modal
+        navigate('/'); // Redirigir al login
+    };
+
+    const handleContinueSession = () => {
+        setShowInactivityModal(false); // Ocultar el modal
+        resetInactivityTimer(); // Reiniciar el temporizador
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(''); // Limpiar errores anteriores
+
+        // Verificar si el token ha caducado
+        const token = localStorage.getItem('token');
+        if (!token || isTokenExpired(token)) {
+            setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            handleLogout();
+            return;
+        }
 
         const deudor = {
             nombreDeudor,
@@ -31,13 +93,6 @@ const CargaDeudores = () => {
         };
 
         try {
-            // Obtener el token JWT del localStorage
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setError('No estás autenticado. Por favor, inicia sesión.');
-                return;
-            }
-
             // Realizar la solicitud POST al endpoint de deudores
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/deudores`, deudor, {
                 headers: {
@@ -163,6 +218,24 @@ const CargaDeudores = () => {
                     <button type="submit" className="btn btn-primary w-100">Guardar</button>
                 </form>
             </div>
+
+            {/* Modal de confirmación de inactividad */}
+            <Modal show={showInactivityModal} onHide={handleContinueSession}>
+                <Modal.Header closeButton>
+                    <Modal.Title>¿Sigues ahí?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Tu sesión está a punto de cerrarse debido a inactividad. ¿Deseas continuar navegando?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleLogout}>
+                        Cerrar sesión
+                    </Button>
+                    <Button variant="primary" onClick={handleContinueSession}>
+                        Continuar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
