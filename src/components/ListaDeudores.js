@@ -78,10 +78,11 @@ const ListaDeudores = () => {
 
                 setDeudores(response.data);
             } catch (err) {
-                if (err.response) {
-                    setError(err.response.data.message || 'Error al obtener los deudores');
+                if (err.response && err.response.status === 401) {
+                    setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                    handleLogout();
                 } else {
-                    setError('Error de conexión. Inténtalo de nuevo más tarde.');
+                    setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
                 }
                 console.error("Error al obtener los deudores:", err);
             }
@@ -121,10 +122,11 @@ const ListaDeudores = () => {
                 alert('Cuota pagada exitosamente');
             }
         } catch (err) {
-            if (err.response) {
-                setError(err.response.data.message || 'Error al pagar la cuota');
+            if (err.response && err.response.status === 401) {
+                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                handleLogout();
             } else {
-                setError('Error de conexión. Inténtalo de nuevo más tarde.');
+                setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
             }
             console.error("Error al pagar la cuota:", err);
         }
