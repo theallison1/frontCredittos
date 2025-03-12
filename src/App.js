@@ -10,6 +10,7 @@ import './App.css'; // Importar estilos personalizados
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Nuevo estado para manejar la carga inicial
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -21,6 +22,7 @@ const App = () => {
         } else {
             setIsLoggedIn(false);
         }
+        setIsLoading(false); // Finaliza la carga inicial
     }, []);
 
     const handleLogout = () => {
@@ -30,6 +32,11 @@ const App = () => {
     };
 
     const showMenu = location.pathname !== '/';
+
+    // Si está cargando, muestra un mensaje de carga (o un spinner)
+    if (isLoading) {
+        return <div>Cargando...</div>;
+    }
 
     return (
         <>
@@ -72,7 +79,7 @@ const App = () => {
                         path="/"
                         element={
                             isLoggedIn ? (
-                                <Navigate to="/home" />
+                                <Navigate to="/home" replace />
                             ) : (
                                 <Login onLogin={(success) => setIsLoggedIn(success)} />
                             )
@@ -84,7 +91,7 @@ const App = () => {
                             isLoggedIn ? (
                                 <Home />
                             ) : (
-                                <Navigate to="/" />
+                                <Navigate to="/" replace />
                             )
                         }
                     />
@@ -94,7 +101,7 @@ const App = () => {
                             isLoggedIn ? (
                                 <CargaDeudores />
                             ) : (
-                                <Navigate to="/" />
+                                <Navigate to="/" replace />
                             )
                         }
                     />
@@ -104,7 +111,7 @@ const App = () => {
                             isLoggedIn ? (
                                 <ListaDeudores />
                             ) : (
-                                <Navigate to="/" />
+                                <Navigate to="/" replace />
                             )
                         }
                     />
