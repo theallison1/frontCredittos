@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
 
 const CargaDeudores = () => {
     const [nombreDeudor, setNombreDeudor] = useState('');
+    const [direccion, setDireccion] = useState(''); // Nuevo estado para la dirección
     const [montoInicial, setMontoInicial] = useState(0);
     const [montoCuotaSemanal, setMontoCuotaSemanal] = useState(0);
     const [fechaInicio, setFechaInicio] = useState('');
@@ -83,6 +84,7 @@ const CargaDeudores = () => {
 
         const deudor = {
             nombreDeudor,
+            direccion, // Nuevo campo
             montoInicial,
             montoCuotaSemanal,
             fechaInicio,
@@ -130,6 +132,18 @@ const CargaDeudores = () => {
                             placeholder="Nombre del deudor"
                             value={nombreDeudor}
                             onChange={(e) => setNombreDeudor(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="direccion" className="form-label">Dirección</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="direccion"
+                            placeholder="Dirección"
+                            value={direccion}
+                            onChange={(e) => setDireccion(e.target.value)}
                             required
                         />
                     </div>
