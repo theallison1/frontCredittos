@@ -331,6 +331,18 @@ const ListaDeudores = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <p>{selectedDeudor?.direccion}</p>
+                    {/* Botón para abrir la dirección en Google Maps */}
+                    <Button
+                        variant="primary"
+                        onClick={() => {
+                            const direccionCodificada = encodeURIComponent(selectedDeudor.direccion);
+                            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${direccionCodificada}`;
+                            window.open(googleMapsUrl, '_blank');
+                        }}
+                        disabled={!selectedDeudor?.direccion} // Deshabilitar si no hay dirección
+                    >
+                        Abrir en Google Maps
+                    </Button>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowDireccionModal(false)}>
