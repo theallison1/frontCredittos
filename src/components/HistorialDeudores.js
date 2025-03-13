@@ -62,7 +62,7 @@ const HistorialDeudores = () => {
 
         const cumpleNombre = deudor.nombreDeudor?.toLowerCase().includes(filtroNombre.toLowerCase());
 
-        const cumpleFecha = !filtroFecha || (deudor.fechaInicio && new Date(deudor.fechaInicio) <= new Date(filtroFecha);
+        const cumpleFecha = !filtroFecha || (deudor.fechaInicio && new Date(deudor.fechaInicio) <= new Date(filtroFecha));
 
         const cumpleMonto = deudor.montoPendiente >= filtroMonto.min && deudor.montoPendiente <= filtroMonto.max;
 
