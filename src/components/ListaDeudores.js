@@ -129,8 +129,8 @@ const ListaDeudores = () => {
 
             if (response.status === 200) {
                 // Actualizar la lista de deudores
-                const updatedDeudores = deudores.map((deudor) =>
-                    deudor.id === id ? response.data : deudor
+                const updatedDeudores = deudores.map((d) =>
+                    d.id === id ? response.data : d
                 );
                 setDeudores(updatedDeudores);
 
@@ -168,10 +168,10 @@ const ListaDeudores = () => {
                 return;
             }
 
-            // Actualizar el campo en el backend
+            // Actualizar el campo en el backend usando el endpoint /pagar-cuota
             const response = await axios.put(
-                `${process.env.REACT_APP_API_URL}/api/deudores/${deudor.id}`,
-                { [field]: value },
+                `${process.env.REACT_APP_API_URL}/api/deudores/${deudor.id}/pagar-cuota`,
+                { [field]: value }, // Envía el campo y el valor a actualizar
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
