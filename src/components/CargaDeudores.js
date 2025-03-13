@@ -76,7 +76,7 @@ const CargaDeudores = () => {
         // Verificar si el token ha caducado
         const token = localStorage.getItem('token');
         if (!token || isTokenExpired(token)) {
-            setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+            alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
             handleLogout();
             return;
         }
@@ -107,12 +107,11 @@ const CargaDeudores = () => {
         } catch (err) {
             // Manejar errores
             if (err.response && err.response.status === 401) {
-                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
                 handleLogout();
             } else {
-                setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
+                alert(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.'); // Usar alert en lugar de console.log
             }
-            console.error("Error al guardar el deudor:", err);
         }
     };
 

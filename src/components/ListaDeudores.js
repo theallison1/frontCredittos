@@ -65,7 +65,7 @@ const ListaDeudores = () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token || isTokenExpired(token)) {
-                    setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
                     handleLogout();
                     return;
                 }
@@ -79,12 +79,11 @@ const ListaDeudores = () => {
                 setDeudores(response.data);
             } catch (err) {
                 if (err.response && err.response.status === 401) {
-                    setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
                     handleLogout();
                 } else {
-                    setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
+                    alert(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.'); // Usar alert en lugar de console.log
                 }
-                console.error("Error al obtener los deudores:", err);
             }
         };
 
@@ -96,7 +95,7 @@ const ListaDeudores = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token || isTokenExpired(token)) {
-                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
                 handleLogout();
                 return;
             }
@@ -123,12 +122,11 @@ const ListaDeudores = () => {
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
-                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
                 handleLogout();
             } else {
-                setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
+                alert(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.'); // Usar alert en lugar de console.log
             }
-            console.error("Error al pagar la cuota:", err);
         }
     };
 
