@@ -189,7 +189,7 @@ const HistorialDeudores = () => {
                                             className="btn btn-info btn-sm"
                                             onClick={() => handleVerHistorial(deudor)}
                                         >
-                                            Ver historial
+                                            Ver detalles
                                         </button>
                                     </td>
                                 </tr>
@@ -199,19 +199,23 @@ const HistorialDeudores = () => {
                 </div>
             </div>
 
-            {/* Modal para ver el historial de pagos */}
+            {/* Modal para ver los detalles del deudor */}
             <Modal show={showHistorialModal} onHide={() => setShowHistorialModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Historial de pagos de {selectedDeudorHistorial?.nombreDeudor}</Modal.Title>
+                    <Modal.Title>Detalles de {selectedDeudorHistorial?.nombreDeudor}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <ul>
-                        {selectedDeudorHistorial?.historialPagos?.map((pago, index) => (
-                            <li key={index}>
-                                Fecha: {new Date(pago.fecha).toLocaleDateString()} - Monto: ${pago.monto.toFixed(2)}
-                            </li>
-                        ))}
-                    </ul>
+                    {selectedDeudorHistorial && (
+                        <div>
+                            <p><strong>Nombre:</strong> {selectedDeudorHistorial.nombreDeudor}</p>
+                            <p><strong>Monto inicial:</strong> ${selectedDeudorHistorial.montoInicial.toFixed(2)}</p>
+                            <p><strong>Monto pendiente:</strong> ${selectedDeudorHistorial.montoPendiente.toFixed(2)}</p>
+                            <p><strong>Fecha de inicio:</strong> {new Date(selectedDeudorHistorial.fechaInicio).toLocaleDateString()}</p>
+                            <p><strong>Último pago:</strong> {new Date(selectedDeudorHistorial.fechaUltimoPago).toLocaleDateString()}</p>
+                            <p><strong>Próximo pago:</strong> {new Date(selectedDeudorHistorial.fechaProximoPago).toLocaleDateString()}</p>
+                            <p><strong>Estado:</strong> {selectedDeudorHistorial.montoPendiente > 0 ? 'Activo' : 'No activo'}</p>
+                        </div>
+                    )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowHistorialModal(false)}>
