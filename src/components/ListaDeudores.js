@@ -11,6 +11,9 @@ const ListaDeudores = () => {
     const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
     const [error, setError] = useState('');
     const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
+    const [showDireccionModal, setShowDireccionModal] = useState(false); // Estado para mostrar el modal de dirección
+    const [selectedDeudor, setSelectedDeudor] = useState(null); // Deudor seleccionado para ver la dirección
+    const navigate = useNavigate();
 
     // Temporizador para detectar inactividad
     let inactivityTimer;
@@ -54,6 +57,7 @@ const ListaDeudores = () => {
     const handleLogout = () => {
         logout(); // Cerrar sesión
         setShowInactivityModal(false); // Ocultar el modal
+        navigate('/'); // Redirigir al login
     };
 
     const handleContinueSession = () => {
@@ -141,6 +145,12 @@ const ListaDeudores = () => {
         }
     };
 
+    // Mostrar la dirección en un modal
+    const handleShowDireccion = (deudor) => {
+        setSelectedDeudor(deudor); // Guardar el deudor seleccionado
+        setShowDireccionModal(true); // Mostrar el modal
+    };
+
     return (
         <div className="card">
             <div className="card-body">
@@ -196,6 +206,12 @@ const ListaDeudores = () => {
                                                 Pagar Cuota
                                             </button>
                                         )}
+                                        <button
+                                            className="btn btn-info btn-sm ms-2"
+                                            onClick={() => handleShowDireccion(deudor)}
+                                        >
+                                            Ver dirección
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -218,6 +234,21 @@ const ListaDeudores = () => {
                     </Button>
                     <Button variant="primary" onClick={handleContinueSession}>
                         Continuar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Modal para mostrar la dirección */}
+            <Modal show={showDireccionModal} onHide={() => setShowDireccionModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Dirección de {selectedDeudor?.nombreDeudor}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{selectedDeudor?.direccion}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDireccionModal(false)}>
+                        Cerrar
                     </Button>
                 </Modal.Footer>
             </Modal>
