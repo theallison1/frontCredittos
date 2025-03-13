@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { isTokenExpired, logout } from '../auth'; // Importar funciones de autenticación
 import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
@@ -13,7 +14,7 @@ const ListaDeudores = () => {
     const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
     const [showDireccionModal, setShowDireccionModal] = useState(false); // Estado para mostrar el modal de dirección
     const [selectedDeudor, setSelectedDeudor] = useState(null); // Deudor seleccionado para ver la dirección
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Usar useNavigate
 
     // Temporizador para detectar inactividad
     let inactivityTimer;
