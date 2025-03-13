@@ -202,3 +202,11 @@ const App = () => {
                     </Button>
                     <Button variant="primary" onClick={handleContinueSession}>
                         Continuar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    );
+};
+
+export default App;
