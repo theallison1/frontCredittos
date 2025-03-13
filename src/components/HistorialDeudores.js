@@ -9,7 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts'; // Grá
 import { CSVLink } from 'react-csv'; // Exportar a CSV
 
 const HistorialDeudores = () => {
-    const [deudores, setDeudores] = useState([]); // Lista completa de deudores
+    const [deudores, setDeudores] = useState([]); // Lista completa de deudores (inicializada como array vacío)
     const [filtroEstado, setFiltroEstado] = useState('todos'); // Filtro por estado (activos, no activos, todos)
     const [filtroNombre, setFiltroNombre] = useState(''); // Filtro por nombre
     const [filtroFecha, setFiltroFecha] = useState(null); // Filtro por fecha
@@ -36,9 +36,16 @@ const HistorialDeudores = () => {
                     },
                 });
 
-                setDeudores(response.data); // Guardar la lista completa de deudores
+                // Verificar que la respuesta sea un array
+                if (Array.isArray(response.data)) {
+                    setDeudores(response.data); // Guardar la lista completa de deudores
+                } else {
+                    setError('La respuesta de la API no es válida.');
+                    setDeudores([]); // Establecer un array vacío como valor por defecto
+                }
             } catch (err) {
                 setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
+                setDeudores([]); // Establecer un array vacío en caso de error
             }
         };
 
@@ -46,19 +53,21 @@ const HistorialDeudores = () => {
     }, []);
 
     // Filtrar deudores
-    const filteredDeudores = deudores.filter((deudor) => {
+    const filteredDeudores = Array.isArray(deudores) ? deudores.filter((deudor) => {
+        if (!deudor) return false; // Evitar errores si deudor es null o undefined
+
         const cumpleEstado = filtroEstado === 'todos' ||
                             (filtroEstado === 'activos' && deudor.montoPendiente > 0) ||
                             (filtroEstado === 'no-activos' && deudor.montoPendiente <= 0);
 
-        const cumpleNombre = deudor.nombreDeudor.toLowerCase().includes(filtroNombre.toLowerCase());
+        const cumpleNombre = deudor.nombreDeudor?.toLowerCase().includes(filtroNombre.toLowerCase());
 
-        const cumpleFecha = !filtroFecha || new Date(deudor.fechaInicio) <= new Date(filtroFecha);
+        const cumpleFecha = !filtroFecha || (deudor.fechaInicio && new Date(deudor.fechaInicio) <= new Date(filtroFecha);
 
         const cumpleMonto = deudor.montoPendiente >= filtroMonto.min && deudor.montoPendiente <= filtroMonto.max;
 
         return cumpleEstado && cumpleNombre && cumpleFecha && cumpleMonto;
-    });
+    }) : [];
 
     // Datos para el gráfico
     const datosGrafico = [
