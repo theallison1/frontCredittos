@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { isTokenExpired, logout } from '../auth'; // Importar funciones de autenticación
@@ -6,7 +6,9 @@ import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
 import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
 
 const ListaDeudores = () => {
-    const [deudores, setDeudores] = useState([]);
+    const [deudores, setDeudores] = useState([]); // Lista completa de deudores
+    const [filteredDeudores, setFilteredDeudores] = useState([]); // Lista filtrada de deudores
+    const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
     const [error, setError] = useState('');
     const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
 
@@ -65,7 +67,7 @@ const ListaDeudores = () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token || isTokenExpired(token)) {
-                    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
+                    setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
                     handleLogout();
                     return;
                 }
@@ -76,13 +78,14 @@ const ListaDeudores = () => {
                     },
                 });
 
-                setDeudores(response.data);
+                setDeudores(response.data); // Guardar la lista completa de deudores
+                setFilteredDeudores(response.data); // Inicializar la lista filtrada con todos los deudores
             } catch (err) {
                 if (err.response && err.response.status === 401) {
-                    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
+                    setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
                     handleLogout();
                 } else {
-                    alert(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.'); // Usar alert en lugar de console.log
+                    setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
                 }
             }
         };
@@ -90,12 +93,20 @@ const ListaDeudores = () => {
         fetchDeudores();
     }, []);
 
+    // Filtrar deudores por nombre
+    useEffect(() => {
+        const filtered = deudores.filter((deudor) =>
+            deudor.nombreDeudor.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setFilteredDeudores(filtered); // Actualizar la lista filtrada
+    }, [searchTerm, deudores]);
+
     // Manejar el pago de una cuota
     const handlePagarCuota = async (id) => {
         try {
             const token = localStorage.getItem('token');
             if (!token || isTokenExpired(token)) {
-                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
+                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
                 handleLogout();
                 return;
             }
@@ -122,10 +133,10 @@ const ListaDeudores = () => {
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
-                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'); // Usar alert en lugar de console.log
+                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
                 handleLogout();
             } else {
-                alert(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.'); // Usar alert en lugar de console.log
+                setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
             }
         }
     };
@@ -134,6 +145,18 @@ const ListaDeudores = () => {
         <div className="card">
             <div className="card-body">
                 <h2 className="card-title">Lista de deudores</h2>
+
+                {/* Campo de búsqueda */}
+                <div className="mb-3">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar por nombre..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="table-responsive">
                     <table className="table">
@@ -151,7 +174,7 @@ const ListaDeudores = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {deudores.map((deudor) => (
+                            {filteredDeudores.map((deudor) => (
                                 <tr key={deudor.id}>
                                     <td>{deudor.nombreDeudor}</td>
                                     <td>${deudor.montoInicial.toFixed(2)}</td>
