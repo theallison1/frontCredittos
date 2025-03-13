@@ -13,7 +13,7 @@ const HistorialDeudores = () => {
     const [filtroEstado, setFiltroEstado] = useState('todos'); // Filtro por estado (activos, no activos, todos)
     const [filtroNombre, setFiltroNombre] = useState(''); // Filtro por nombre
     const [filtroFecha, setFiltroFecha] = useState(null); // Filtro por fecha
-    const [filtroMonto, setFiltroMonto] = useState({ min: 0, max: Infinity }); // Filtro por monto pendiente
+    const [filtroMonto, setFiltroMonto] = useState({ min: 0, max: Number.MAX_SAFE_INTEGER }); // Filtro por monto pendiente
     const [error, setError] = useState('');
     const [showHistorialModal, setShowHistorialModal] = useState(false); // Modal para ver el historial de pagos
     const [selectedDeudorHistorial, setSelectedDeudorHistorial] = useState(null); // Deudor seleccionado para ver el historial
@@ -129,7 +129,7 @@ const HistorialDeudores = () => {
                         type="number"
                         className="form-control mt-2"
                         placeholder="Monto máximo"
-                        value={filtroMonto.max}
+                        value={filtroMonto.max === Number.MAX_SAFE_INTEGER ? '' : filtroMonto.max} // Mostrar vacío si no hay límite
                         onChange={(e) => setFiltroMonto({ ...filtroMonto, max: parseFloat(e.target.value) || Infinity })}
                     />
                 </div>
