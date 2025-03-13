@@ -4,6 +4,7 @@ import Login from './components/Login';
 import Home from './components/Home';
 import CargaDeudores from './components/CargaDeudores';
 import ListaDeudores from './components/ListaDeudores';
+import HistorialDeudores from './components/HistorialDeudores'; // Nuevo componente
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import './App.css'; // Importar estilos personalizados
@@ -119,6 +120,9 @@ const App = () => {
                                 <li className="nav-item">
                                     <Link to="/lista-deudores" className="nav-link">Lista de deudores</Link>
                                 </li>
+                                <li className="nav-item">
+                                    <Link to="/historial-deudores" className="nav-link">Historial de deudores</Link>
+                                </li>
                             </ul>
                             {isLoggedIn && (
                                 <button className="btn btn-outline-danger" onClick={handleLogout}>
@@ -171,6 +175,16 @@ const App = () => {
                             )
                         }
                     />
+                    <Route
+                        path="/historial-deudores"
+                        element={
+                            isLoggedIn ? (
+                                <HistorialDeudores />
+                            ) : (
+                                <Navigate to="/" replace />
+                            )
+                        }
+                    />
                 </Routes>
             </div>
 
@@ -188,11 +202,3 @@ const App = () => {
                     </Button>
                     <Button variant="primary" onClick={handleContinueSession}>
                         Continuar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
-    );
-};
-
-export default App;
