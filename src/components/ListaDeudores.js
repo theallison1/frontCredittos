@@ -7,8 +7,7 @@ import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
 import Button from 'react-bootstrap/Button'; // Importar el botón de Bootstrap
 
 const ListaDeudores = () => {
-    const [deudores, setDeudores] = useState([]); // Lista completa de deudores
-    const [filteredDeudores, setFilteredDeudores] = useState([]); // Lista filtrada de deudores
+    const [deudores, setDeudores] = useState([]); // Lista de deudores activos
     const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
     const [error, setError] = useState('');
     const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
@@ -67,9 +66,9 @@ const ListaDeudores = () => {
         resetInactivityTimer(); // Reiniciar el temporizador
     };
 
-    // Obtener la lista de deudores al cargar el componente
+    // Obtener la lista de deudores activos al cargar el componente
     useEffect(() => {
-        const fetchDeudores = async () => {
+        const fetchDeudoresActivos = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token || isTokenExpired(token)) {
@@ -78,14 +77,14 @@ const ListaDeudores = () => {
                     return;
                 }
 
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/deudores`, {
+                // Llamar al endpoint de deudores activos
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/deudores/activos`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
 
-                setDeudores(response.data); // Guardar la lista completa de deudores
-                setFilteredDeudores(response.data); // Inicializar la lista filtrada con todos los deudores
+                setDeudores(response.data); // Guardar la lista de deudores activos
             } catch (err) {
                 if (err.response && err.response.status === 401) {
                     setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
@@ -96,16 +95,13 @@ const ListaDeudores = () => {
             }
         };
 
-        fetchDeudores();
+        fetchDeudoresActivos();
     }, []);
 
     // Filtrar deudores por nombre
-    useEffect(() => {
-        const filtered = deudores.filter((deudor) =>
-            deudor.nombreDeudor.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredDeudores(filtered); // Actualizar la lista filtrada
-    }, [searchTerm, deudores]);
+    const filteredDeudores = deudores.filter((deudor) =>
+        deudor.nombreDeudor.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // Manejar el pago de una cuota
     const handlePagarCuota = async (id) => {
@@ -231,7 +227,6 @@ const ListaDeudores = () => {
                                 <th>Último pago</th>
                                 <th>Próximo pago</th>
                                 <th>Monto pendiente</th>
-                                <th>Cobrado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -289,19 +284,14 @@ const ListaDeudores = () => {
                                         )}
                                     </td>
                                     <td>${deudor.montoPendiente.toFixed(2)}</td>
-                                    <td>{deudor.cobrado ? "Sí" : "No"}</td>
                                     <td>
-                                        {deudor.cobrado || deudor.montoPendiente <= 0 ? (
-                                            <span className="text-success">Cobrado</span>
-                                        ) : (
-                                            <button
-                                                className="btn btn-success btn-sm"
-                                                onClick={() => handlePagarCuota(deudor.id)}
-                                                disabled={deudor.montoPendiente <= 0 || deudor.cobrado}
-                                            >
-                                                Pagar Cuota
-                                            </button>
-                                        )}
+                                        <button
+                                            className="btn btn-success btn-sm"
+                                            onClick={() => handlePagarCuota(deudor.id)}
+                                            disabled={deudor.montoPendiente <= 0}
+                                        >
+                                            Pagar Cuota
+                                        </button>
                                         <button
                                             className="btn btn-info btn-sm ms-2"
                                             onClick={() => handleShowDireccion(deudor)}
