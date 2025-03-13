@@ -36,9 +36,9 @@ const HistorialDeudores = () => {
                     },
                 });
 
-                // Verificar que la respuesta sea un array
-                if (Array.isArray(response.data)) {
-                    setDeudores(response.data); // Guardar la lista completa de deudores
+                // Verificar la estructura de la respuesta
+                if (response.data && Array.isArray(response.data.data)) {
+                    setDeudores(response.data.data); // Guardar la lista de deudores desde response.data.data
                 } else {
                     setError('La respuesta de la API no es válida.');
                     setDeudores([]); // Establecer un array vacío como valor por defecto
