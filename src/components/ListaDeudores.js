@@ -331,7 +331,25 @@ const ListaDeudores = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <p>{selectedDeudor?.direccion}</p>
-                    {/* Botón para abrir la dirección en Google Maps */}
+
+                    {/* Vista previa del mapa */}
+                    {selectedDeudor?.direccion ? (
+                        <div style={{ width: '100%', height: '300px', marginTop: '10px' }}>
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                src={`https://www.google.com/maps/embed/v1/place?key=TU_API_KEY&q=${encodeURIComponent(
+                                    selectedDeudor.direccion
+                                )}`}
+                                allowFullScreen
+                            ></iframe>
+                        </div>
+                    ) : (
+                        <p>No hay una dirección válida para mostrar el mapa.</p>
+                    )}
+
+                    {/* Botón para abrir en Google Maps */}
                     <Button
                         variant="primary"
                         onClick={() => {
@@ -340,6 +358,7 @@ const ListaDeudores = () => {
                             window.open(googleMapsUrl, '_blank');
                         }}
                         disabled={!selectedDeudor?.direccion} // Deshabilitar si no hay dirección
+                        style={{ marginTop: '10px' }}
                     >
                         Abrir en Google Maps
                     </Button>
