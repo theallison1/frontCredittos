@@ -117,9 +117,15 @@ const ListaDeudores = () => {
                 return;
             }
 
+            // Obtener el deudor actual
+            const deudor = deudores.find((d) => d.id === id);
+
+            // Enviar el monto de la cuota semanal actualizado al backend
             const response = await axios.put(
                 `${process.env.REACT_APP_API_URL}/api/deudores/${id}/pagar-cuota`,
-                {},
+                {
+                    montoCuotaSemanal: deudor.montoCuotaSemanal, // Enviar el monto actualizado
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
