@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { isTokenExpired, logout } from '../auth'; // Importar funciones de autenticación
 import Modal from 'react-bootstrap/Modal'; // Importar el modal de Bootstrap
@@ -14,7 +14,8 @@ const ListaDeudores = () => {
     const [showInactivityModal, setShowInactivityModal] = useState(false); // Estado para mostrar el modal de inactividad
     const [showDireccionModal, setShowDireccionModal] = useState(false); // Estado para mostrar el modal de dirección
     const [selectedDeudor, setSelectedDeudor] = useState(null); // Deudor seleccionado para ver la dirección
-    const navigate = useNavigate(); // Usar useNavigate
+    const [editingDeudor, setEditingDeudor] = useState(null); // Deudor en edición
+    const navigate = useNavigate();
 
     // Temporizador para detectar inactividad
     let inactivityTimer;
@@ -152,6 +153,50 @@ const ListaDeudores = () => {
         setShowDireccionModal(true); // Mostrar el modal
     };
 
+    // Habilitar la edición de un campo
+    const handleEditField = (deudor, field) => {
+        setEditingDeudor({ ...deudor, field }); // Guardar el deudor y el campo en edición
+    };
+
+    // Guardar los cambios en un campo
+    const handleSaveField = async (deudor, field, value) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token || isTokenExpired(token)) {
+                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                handleLogout();
+                return;
+            }
+
+            // Actualizar el campo en el backend
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_URL}/api/deudores/${deudor.id}`,
+                { [field]: value },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                // Actualizar la lista de deudores
+                const updatedDeudores = deudores.map((d) =>
+                    d.id === deudor.id ? response.data : d
+                );
+                setDeudores(updatedDeudores);
+                setEditingDeudor(null); // Desactivar la edición
+            }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                setError('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                handleLogout();
+            } else {
+                setError(err.response?.data?.message || 'Error de conexión. Inténtalo de nuevo más tarde.');
+            }
+        }
+    };
+
     return (
         <div className="card">
             <div className="card-body">
@@ -189,10 +234,54 @@ const ListaDeudores = () => {
                                 <tr key={deudor.id}>
                                     <td>{deudor.nombreDeudor}</td>
                                     <td>${deudor.montoInicial.toFixed(2)}</td>
-                                    <td>${deudor.montoCuotaSemanal.toFixed(2)}</td>
+                                    <td>
+                                        {editingDeudor?.id === deudor.id && editingDeudor.field === 'montoCuotaSemanal' ? (
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                value={editingDeudor.montoCuotaSemanal}
+                                                onChange={(e) =>
+                                                    setEditingDeudor({
+                                                        ...editingDeudor,
+                                                        montoCuotaSemanal: parseFloat(e.target.value),
+                                                    })
+                                                }
+                                                onBlur={() =>
+                                                    handleSaveField(deudor, 'montoCuotaSemanal', editingDeudor.montoCuotaSemanal)
+                                                }
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <span onClick={() => handleEditField(deudor, 'montoCuotaSemanal')}>
+                                                ${deudor.montoCuotaSemanal.toFixed(2)}
+                                            </span>
+                                        )}
+                                    </td>
                                     <td>{new Date(deudor.fechaInicio).toLocaleDateString()}</td>
                                     <td>{new Date(deudor.fechaUltimoPago).toLocaleDateString()}</td>
-                                    <td>{new Date(deudor.fechaProximoPago).toLocaleDateString()}</td>
+                                    <td>
+                                        {editingDeudor?.id === deudor.id && editingDeudor.field === 'fechaProximoPago' ? (
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={editingDeudor.fechaProximoPago}
+                                                onChange={(e) =>
+                                                    setEditingDeudor({
+                                                        ...editingDeudor,
+                                                        fechaProximoPago: e.target.value,
+                                                    })
+                                                }
+                                                onBlur={() =>
+                                                    handleSaveField(deudor, 'fechaProximoPago', editingDeudor.fechaProximoPago)
+                                                }
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <span onClick={() => handleEditField(deudor, 'fechaProximoPago')}>
+                                                {new Date(deudor.fechaProximoPago).toLocaleDateString()}
+                                            </span>
+                                        )}
+                                    </td>
                                     <td>${deudor.montoPendiente.toFixed(2)}</td>
                                     <td>{deudor.cobrado ? "Sí" : "No"}</td>
                                     <td>
