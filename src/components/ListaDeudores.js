@@ -339,7 +339,7 @@ const ListaDeudores = () => {
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}
-                                src={`https://www.google.com/maps/embed/v1/place?key=TU_API_KEY&q=${encodeURIComponent(
+                                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyDULAK3JgkbhwdKUv1vfunu2U-1C68yNGQ&q=${encodeURIComponent(
                                     selectedDeudor.direccion
                                 )}`}
                                 allowFullScreen
